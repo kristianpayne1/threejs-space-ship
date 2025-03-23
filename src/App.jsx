@@ -1,22 +1,17 @@
 import { Canvas } from "@react-three/fiber";
 import { AudioListenerProvider } from "./hooks/useAudioListener.jsx";
-import Duck from "./components/Duck.jsx";
-import { ContactShadows, OrbitControls } from "@react-three/drei";
+import { OrbitControls, Stars } from "@react-three/drei";
+import Ship from "./components/Ship.jsx";
 
 function App() {
     return (
         <AudioListenerProvider>
-            <Canvas camera={{ position: [3, 3, -3] }}>
-                <ambientLight intensity={3} />
+            <Canvas camera={{ position: [10, 8, 10] }} shadows>
+                <ambientLight />
+                <directionalLight />
                 <OrbitControls />
-                <Duck />
-                <ContactShadows
-                    position={[0, -0.25, 0]}
-                    opacity={0.5}
-                    scale={10}
-                    blur={1.5}
-                    far={0.8}
-                />
+                <Ship />
+                <Stars radius={300} count={2000} saturation={0} />
             </Canvas>
         </AudioListenerProvider>
     );

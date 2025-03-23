@@ -3,7 +3,7 @@ body,
 div#root {
     height: 100%;
     margin: 0;
-    background-color: #62d3ff;
+    background-color: black;
 }
 
 canvas {
