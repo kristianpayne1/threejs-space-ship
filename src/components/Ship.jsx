@@ -1,9 +1,71 @@
+import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
+import { animated, useSpring, easings } from "@react-spring/three";
+import { Vector3, Euler, Quaternion } from "three";
+import { useEffect, useRef } from "react";
 
-function Ship(props) {
+function getRandomPosition(origin, max = 1) {
+    const x = Math.random() * (max + max) - max;
+    const y = Math.random() * (max + max) - max;
+    const z = Math.random() * (max + max) - max;
+
+    return [origin[0] + x, origin[1] + y, origin[2] + z];
+}
+function move(ref, { api, origin }) {
+    const position = getRandomPosition(origin);
+    api.start({
+        position,
+        config: {
+            duration: Math.random() * (10e3 - 5e3) + 5e3,
+        },
+        onRest: () => move(ref, { api, origin }), // Recursive movement
+    });
+}
+
+function Ship({ position = [0, 0, 0], rotation, ...props }) {
+    const ref = useRef(null);
+
     const { nodes, materials } = useGLTF("./models/space-ship.glb");
+
+    const [springs, api] = useSpring(() => ({
+        position,
+        config: {
+            duration: Math.random() * (10e3 - 5e3) + 5e3,
+            tension: 400,
+            easing: easings.easeInOutBack,
+        },
+    }));
+
+    const previousPosition = new Vector3(...position);
+    const currentPosition = new Vector3();
+    const maxRotation = Math.PI / 6;
+    const newRotation = new Euler();
+    const targetQuaternion = new Quaternion();
+
+    useFrame((_, deltaTime) => {
+        if (!ref.current) return;
+        currentPosition.copy(ref.current.position);
+        const distance = currentPosition.sub(previousPosition);
+        const velocity = distance.divideScalar(deltaTime);
+        previousPosition.copy(ref.current.position);
+        newRotation.copy(ref.current.rotation);
+        newRotation.x = -velocity.y * maxRotation;
+        newRotation.z = -velocity.x * maxRotation;
+        targetQuaternion.setFromEuler(newRotation);
+        ref.current.quaternion.slerp(targetQuaternion, 0.001);
+    });
+
+    useEffect(() => {
+        move(ref, { api, origin: position, rotation });
+    }, [ref, api, position, rotation]);
+
     return (
-        <group {...props} dispose={null}>
+        <animated.group
+            ref={ref}
+            position={springs.position}
+            rotation={rotation}
+            {...props}
+        >
             <mesh
                 castShadow={true}
                 receiveShadow={true}
@@ -12,7 +74,7 @@ function Ship(props) {
                 rotation={[Math.PI / 2, 0, 0]}
                 scale={0.01}
             />
-        </group>
+        </animated.group>
     );
 }
 
