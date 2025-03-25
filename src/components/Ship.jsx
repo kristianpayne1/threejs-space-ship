@@ -2,10 +2,10 @@ import { useGLTF } from "@react-three/drei";
 import { animated } from "@react-spring/three";
 import { useEffect, useRef, useState } from "react";
 import useTextures from "../hooks/useTextures.jsx";
-import useShipAnimation from "../hooks/useShipAnimation.jsx";
 import { SRGBColorSpace } from "three";
+import useFlightControls from "../hooks/useFlightControls.jsx";
 
-function Ship({ position = [0, 0, 0], rotation, ...props }) {
+function Ship({ ...props }) {
     const ref = useRef(null);
     const shipRef = useRef(null);
     const [textureIndex, setTextureIndex] = useState(1);
@@ -13,8 +13,9 @@ function Ship({ position = [0, 0, 0], rotation, ...props }) {
     const { nodes, materials } = useGLTF("./models/Space_Ship.glb");
     const textures = useTextures();
 
-    const [springs] = useShipAnimation(ref, position, rotation);
+    const [springs] = useFlightControls(ref);
 
+    // swap texture
     useEffect(() => {
         if (!textures.length || !shipRef.current) return;
         const texture = textures[textureIndex % textures.length];
@@ -28,7 +29,7 @@ function Ship({ position = [0, 0, 0], rotation, ...props }) {
         <animated.group
             ref={ref}
             position={springs.position}
-            rotation={rotation}
+            rotation={springs.rotation}
             onClick={() => setTextureIndex((state) => state + 1)}
             {...props}
         >
