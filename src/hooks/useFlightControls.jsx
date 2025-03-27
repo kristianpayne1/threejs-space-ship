@@ -12,6 +12,7 @@ const plane = new Plane(new Vector3(1, 0, 1));
 const result = new Vector3(0, 0, 0);
 
 let isOver = false;
+let rotate = 0;
 function handleWindowPointerOver() {
     isOver = true;
 }
@@ -25,32 +26,53 @@ function handleWindowPointerOut(api) {
     };
 }
 
-function handleWindowPointerMove(api) {
+function handleWindowPointerMove(api, enabled) {
     return function () {
-        if (!isOver || !result) return;
+        if (!isOver || !result || !enabled) return;
         api.start({
             position: [result.x, result.y, result.z - 8],
-            config: { mass: 200, friction: 350, tension: 800 },
+            config: { mass: 20, friction: 60, tension: 100 },
         });
     };
 }
 
-function useFlightControls(ref) {
+function handleKeyDown(enabled) {
+    return function (e) {
+        if (!enabled) return;
+        const key = e.key;
+        if (key === "a") rotate = -0.5;
+        else if (key === "d") rotate = 0.5;
+    };
+}
+
+function handleKeyUp() {
+    if (rotate) rotate = 0;
+}
+
+function useFlightControls(ref, enabled = true) {
     const [springs, api] = useSpring(() => ({
         config: { mass: 200, friction: 350, tension: 800 },
     }));
 
     useFrame((_, deltaTime) => {
-        if (!ref.current) return;
+        if (!ref.current || !enabled) return;
+
         currentPosition.copy(ref.current.position);
         const distance = currentPosition.sub(previousPosition);
         const velocity = distance.divideScalar(deltaTime);
         previousPosition.copy(ref.current.position);
         newRotation.copy(ref.current.rotation);
         newRotation.x = -velocity.y * maxRotation;
-        newRotation.z = -velocity.x * maxRotation;
-        targetQuaternion.setFromEuler(newRotation);
-        ref.current.quaternion.slerp(targetQuaternion, 0.1);
+
+        if (rotate) {
+            newRotation.z += rotate;
+            targetQuaternion.setFromEuler(newRotation);
+            ref.current.quaternion.slerp(targetQuaternion, 0.08);
+        } else {
+            newRotation.z = -velocity.x * maxRotation;
+            targetQuaternion.setFromEuler(newRotation);
+            ref.current.quaternion.slerp(targetQuaternion, 0.01);
+        }
     });
 
     useFrame(({ raycaster }) => {
@@ -61,20 +83,27 @@ function useFlightControls(ref) {
     useEffect(() => {
         window.addEventListener("pointerover", handleWindowPointerOver);
         window.addEventListener("pointerout", handleWindowPointerOut(api));
-        window.addEventListener("pointermove", handleWindowPointerMove(api));
+        window.addEventListener(
+            "pointermove",
+            handleWindowPointerMove(api, enabled),
+        );
+        window.addEventListener("keydown", handleKeyDown(enabled));
+        window.addEventListener("keyup", handleKeyUp);
 
         return () => {
             window.removeEventListener("pointerover", handleWindowPointerOver);
             window.removeEventListener(
                 "pointerout",
-                handleWindowPointerOut(api),
+                handleWindowPointerOut(api, enabled),
             );
             window.removeEventListener(
                 "pointermove",
-                handleWindowPointerMove(api),
+                handleWindowPointerMove(api, enabled),
             );
+            window.removeEventListener("keydown", handleKeyDown(enabled));
+            window.addEventListener("keyup", handleKeyUp);
         };
-    }, [api]);
+    }, [api, enabled]);
 
     return [springs, api];
 }
