@@ -5,7 +5,7 @@ import useTextures from "../hooks/useTextures.jsx";
 import { SRGBColorSpace } from "three";
 import useFlightControls from "../hooks/useFlightControls.jsx";
 
-function Ship({ ...props }) {
+function Ship({ position, ...props }) {
     const ref = useRef(null);
     const shipRef = useRef(null);
     const [textureIndex, setTextureIndex] = useState(1);
@@ -13,7 +13,7 @@ function Ship({ ...props }) {
     const { nodes, materials } = useGLTF("./models/Space_Ship.glb");
     const textures = useTextures();
 
-    const [springs] = useFlightControls(ref);
+    const [springs] = useFlightControls(ref, { position });
 
     // swap texture
     useEffect(() => {

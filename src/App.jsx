@@ -8,12 +8,12 @@ import { Suspense } from "react";
 function App() {
     return (
         <AudioListenerProvider>
-            <Canvas camera={{ position: [0, 0, -20] }} shadows>
+            <Canvas camera={{ position: [0, 0, -100] }} shadows>
                 <Suspense fallback={null}>
                     <TextureProvider>
                         <ambientLight />
                         <directionalLight />
-                        <Ship />
+                        <Ship position={[0, 0, -80]} />
                         <Stars radius={300} count={2000} saturation={0} />
                     </TextureProvider>
                 </Suspense>
