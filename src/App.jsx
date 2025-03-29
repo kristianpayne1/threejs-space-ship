@@ -8,7 +8,7 @@ import { Suspense } from "react";
 function App() {
     return (
         <AudioListenerProvider>
-            <Canvas camera={{ position: [10, 8, 10] }} shadows>
+            <Canvas camera={{ position: [0, 0, -20] }} shadows>
                 <Suspense fallback={null}>
                     <TextureProvider>
                         <ambientLight />

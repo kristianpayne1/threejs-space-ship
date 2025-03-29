@@ -8,7 +8,7 @@ const currentPosition = new Vector3();
 const maxRotation = Math.PI / 150;
 const newRotation = new Euler();
 const targetQuaternion = new Quaternion();
-const plane = new Plane(new Vector3(1, 0, 1));
+const plane = new Plane(new Vector3(0, 0, Math.PI / 2));
 const result = new Vector3(0, 0, 0);
 
 let isOver = false;
@@ -33,8 +33,8 @@ function handleKeyDown(enabled) {
         const key = e.key;
         if (key === "a") rotate = -0.5;
         if (key === "d") rotate = 0.5;
-        if (key === "w") offsetY = 4;
-        if (key === "s") offsetY = -4;
+        if (key === "w") offsetY = 5;
+        if (key === "s") offsetY = -5;
     };
 }
 
@@ -73,7 +73,7 @@ function useFlightControls(ref, enabled = true) {
         if (!isOver || !enabled) return;
         raycaster.ray.intersectPlane(plane, result);
         api.start({
-            position: [result.x, result.y + offsetY, result.z - 8],
+            position: [result.x, result.y + offsetY, result.z + 10],
             config: { mass: 20, friction: 60, tension: 100 },
         });
     });
