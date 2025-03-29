@@ -13,6 +13,7 @@ const result = new Vector3(0, 0, 0);
 
 let isOver = false;
 let rotate = 0;
+let offsetY = 0;
 function handleWindowPointerOver() {
     isOver = true;
 }
@@ -26,27 +27,20 @@ function handleWindowPointerOut(api) {
     };
 }
 
-function handleWindowPointerMove(api, enabled) {
-    return function () {
-        if (!isOver || !result || !enabled) return;
-        api.start({
-            position: [result.x, result.y, result.z - 8],
-            config: { mass: 20, friction: 60, tension: 100 },
-        });
-    };
-}
-
 function handleKeyDown(enabled) {
     return function (e) {
         if (!enabled) return;
         const key = e.key;
         if (key === "a") rotate = -0.5;
-        else if (key === "d") rotate = 0.5;
+        if (key === "d") rotate = 0.5;
+        if (key === "w") offsetY = 4;
+        if (key === "s") offsetY = -4;
     };
 }
 
 function handleKeyUp() {
     if (rotate) rotate = 0;
+    if (offsetY) offsetY = 0;
 }
 
 function useFlightControls(ref, enabled = true) {
@@ -67,7 +61,7 @@ function useFlightControls(ref, enabled = true) {
         if (rotate) {
             newRotation.z += rotate;
             targetQuaternion.setFromEuler(newRotation);
-            ref.current.quaternion.slerp(targetQuaternion, 0.08);
+            ref.current.quaternion.slerp(targetQuaternion, 0.05);
         } else {
             newRotation.z = -velocity.x * maxRotation;
             targetQuaternion.setFromEuler(newRotation);
@@ -76,17 +70,17 @@ function useFlightControls(ref, enabled = true) {
     });
 
     useFrame(({ raycaster }) => {
-        if (!isOver) return;
+        if (!isOver || !enabled) return;
         raycaster.ray.intersectPlane(plane, result);
+        api.start({
+            position: [result.x, result.y + offsetY, result.z - 8],
+            config: { mass: 20, friction: 60, tension: 100 },
+        });
     });
 
     useEffect(() => {
         window.addEventListener("pointerover", handleWindowPointerOver);
         window.addEventListener("pointerout", handleWindowPointerOut(api));
-        window.addEventListener(
-            "pointermove",
-            handleWindowPointerMove(api, enabled),
-        );
         window.addEventListener("keydown", handleKeyDown(enabled));
         window.addEventListener("keyup", handleKeyUp);
 
@@ -95,10 +89,6 @@ function useFlightControls(ref, enabled = true) {
             window.removeEventListener(
                 "pointerout",
                 handleWindowPointerOut(api, enabled),
-            );
-            window.removeEventListener(
-                "pointermove",
-                handleWindowPointerMove(api, enabled),
             );
             window.removeEventListener("keydown", handleKeyDown(enabled));
             window.addEventListener("keyup", handleKeyUp);
