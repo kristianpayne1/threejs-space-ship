@@ -9,6 +9,7 @@ const maxRotation = Math.PI / 100;
 const currentRotation = new Quaternion();
 const newRotation = new Euler();
 const targetQuaternion = new Quaternion();
+
 const plane = new Plane(new Vector3(0, 0, Math.PI / 2));
 const result = new Vector3(0, 0, 0);
 
@@ -39,9 +40,10 @@ function handleKeyDown(enabled) {
     };
 }
 
-function handleKeyUp() {
-    if (offsetX) offsetX = 0;
-    if (offsetY) offsetY = 0;
+function handleKeyUp(e) {
+    const key = e.key;
+    if (key === "a" || key === "d") offsetX = 0;
+    if (key === "w" || key === "s") offsetY = 0;
 }
 
 function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
@@ -62,13 +64,15 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
         });
 
         ref.current.lookAt(result);
+
+        // calculate velocity
         currentPosition.copy(ref.current.position);
         const distance = currentPosition.sub(previousPosition);
         const velocity = distance.divideScalar(deltaTime);
-        console.log(velocity);
         previousPosition.copy(ref.current.position);
-        newRotation.copy(ref.current.rotation);
 
+        // rotate ship based on velocity
+        newRotation.copy(ref.current.rotation);
         newRotation.z = -velocity.x * maxRotation;
         targetQuaternion.setFromEuler(newRotation);
         currentRotation.slerp(targetQuaternion, 0.02);
