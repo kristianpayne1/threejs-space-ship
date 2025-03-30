@@ -55,8 +55,8 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
     }));
 
     useFrame(({ raycaster }, deltaTime) => {
-        if (!isOver || !enabled) return;
-        raycaster.ray.intersectPlane(plane, result);
+        if (isOver) raycaster.ray.intersectPlane(plane, result);
+        else result.set(0, 0, 0);
         currentPosition.set(...position);
         currentPosition.x = offsetX;
         currentPosition.y = offsetY;
@@ -79,7 +79,7 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
         // rotate ship based on velocity
         newRotation.z = -velocity.x * maxRotation;
         targetQuaternion.setFromEuler(newRotation);
-        currentRotation.slerp(targetQuaternion, 0.05);
+        currentRotation.slerp(targetQuaternion, 0.1);
         ref.current.rotation.x = currentRotation.x;
         ref.current.rotation.y = currentRotation.y;
         ref.current.rotation.z = currentRotation.z;
