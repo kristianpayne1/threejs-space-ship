@@ -2,17 +2,19 @@ import { Euler, Plane, Quaternion, Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 import { useSpring } from "@react-spring/three";
 import { useEffect } from "react";
+import { clamp } from "three/src/math/MathUtils.js";
 
 const previousPosition = new Vector3(0, 0, 0);
 const currentPosition = new Vector3();
 
 const previousRotation = new Quaternion();
-const maxRotation = Math.PI / 150;
+const maxRotation = Math.PI / 125;
 const newRotation = new Euler();
 const currentRotation = new Quaternion();
 const targetQuaternion = new Quaternion();
 
 const plane = new Plane(new Vector3(0, 0, Math.PI / 2));
+plane.translate(new Vector3(0, 0, 400));
 const result = new Vector3(0, 0, 0);
 
 let isOver = false;
@@ -51,7 +53,7 @@ function handleKeyUp(e) {
 function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
     const [springs, api] = useSpring(() => ({
         position,
-        config: { mass: 200, friction: 350, tension: 800 },
+        config: { mass: 200, friction: 600, tension: 800 },
     }));
 
     useFrame(({ raycaster }, deltaTime) => {
@@ -77,7 +79,8 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
         previousPosition.copy(ref.current.position);
 
         // rotate ship based on velocity
-        newRotation.z = -velocity.x * maxRotation;
+        newRotation.z += -velocity.x * maxRotation;
+        console.log(newRotation);
         targetQuaternion.setFromEuler(newRotation);
         currentRotation.slerp(targetQuaternion, 0.05);
         ref.current.quaternion.copy(currentRotation);

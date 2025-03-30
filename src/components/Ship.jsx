@@ -40,7 +40,7 @@ function Ship({ position, ...props }) {
                 geometry={nodes.SM_Ship_Fighter_03.geometry}
                 material={materials["Material.001"]}
                 rotation={[Math.PI / 2, 0, 0]}
-                scale={0.01}
+                scale={0.004}
             />
         </animated.group>
     );
