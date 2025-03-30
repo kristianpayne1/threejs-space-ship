@@ -7,7 +7,7 @@ const previousPosition = new Vector3(0, 0, 0);
 const currentPosition = new Vector3();
 
 const previousRotation = new Quaternion();
-const maxRotation = Math.PI / 100;
+const maxRotation = Math.PI / 150;
 const newRotation = new Euler();
 const currentRotation = new Quaternion();
 const targetQuaternion = new Quaternion();
@@ -79,10 +79,8 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
         // rotate ship based on velocity
         newRotation.z = -velocity.x * maxRotation;
         targetQuaternion.setFromEuler(newRotation);
-        currentRotation.slerp(targetQuaternion, 0.1);
-        ref.current.rotation.x = currentRotation.x;
-        ref.current.rotation.y = currentRotation.y;
-        ref.current.rotation.z = currentRotation.z;
+        currentRotation.slerp(targetQuaternion, 0.05);
+        ref.current.quaternion.copy(currentRotation);
     });
 
     useEffect(() => {
