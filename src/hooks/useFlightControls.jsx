@@ -80,8 +80,8 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
 
         // rotate ship based on velocity
         newRotation.z += -velocity.x * maxRotation;
-        console.log(newRotation);
         targetQuaternion.setFromEuler(newRotation);
+        console.log(targetQuaternion);
         currentRotation.slerp(targetQuaternion, 0.05);
         ref.current.quaternion.copy(currentRotation);
     });

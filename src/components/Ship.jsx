@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import useTextures from "../hooks/useTextures.jsx";
 import { SRGBColorSpace } from "three";
 import useFlightControls from "../hooks/useFlightControls.jsx";
+import LaserGun from "./LaserGun.jsx";
 
 function Ship({ position, ...props }) {
     const ref = useRef(null);
@@ -42,6 +43,7 @@ function Ship({ position, ...props }) {
                 rotation={[Math.PI / 2, 0, 0]}
                 scale={0.004}
             />
+            <LaserGun />
         </animated.group>
     );
 }
