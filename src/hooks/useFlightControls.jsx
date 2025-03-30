@@ -37,10 +37,10 @@ function handleKeyDown(enabled) {
     return function (e) {
         if (!enabled) return;
         const key = e.key;
-        if (key === "a") offsetX = 15;
-        if (key === "d") offsetX = -15;
-        if (key === "w") offsetY = 10;
-        if (key === "s") offsetY = -10;
+        if (key === "a") offsetX = 12;
+        if (key === "d") offsetX = -12;
+        if (key === "w") offsetY = 6;
+        if (key === "s") offsetY = -6;
     };
 }
 
