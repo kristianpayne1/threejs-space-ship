@@ -5,9 +5,11 @@ import { useEffect } from "react";
 
 const previousPosition = new Vector3(0, 0, 0);
 const currentPosition = new Vector3();
+
+const previousRotation = new Quaternion();
 const maxRotation = Math.PI / 100;
-const currentRotation = new Quaternion();
 const newRotation = new Euler();
+const currentRotation = new Quaternion();
 const targetQuaternion = new Quaternion();
 
 const plane = new Plane(new Vector3(0, 0, Math.PI / 2));
@@ -63,7 +65,10 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
             position: currentPosition.toArray(),
         });
 
+        previousRotation.copy(ref.current.quaternion);
         ref.current.lookAt(result);
+        newRotation.copy(ref.current.rotation);
+        ref.current.quaternion.copy(previousRotation);
 
         // calculate velocity
         currentPosition.copy(ref.current.position);
@@ -72,11 +77,12 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
         previousPosition.copy(ref.current.position);
 
         // rotate ship based on velocity
-        newRotation.copy(ref.current.rotation);
         newRotation.z = -velocity.x * maxRotation;
         targetQuaternion.setFromEuler(newRotation);
-        currentRotation.slerp(targetQuaternion, 0.02);
-        ref.current.rotateZ(currentRotation.z);
+        currentRotation.slerp(targetQuaternion, 0.05);
+        ref.current.rotation.x = currentRotation.x;
+        ref.current.rotation.y = currentRotation.y;
+        ref.current.rotation.z = currentRotation.z;
     });
 
     useEffect(() => {
