@@ -18,7 +18,8 @@ plane.translate(new Vector3(0, 0, 200));
 const result = new Vector3(0, 0, 0);
 
 let isOver = false;
-let rotateZ = 0;
+let rotate = 0,
+    rotateZ = 0;
 function handleWindowPointerOver() {
     isOver = true;
 }
@@ -36,14 +37,17 @@ function handleKeyDown(enabled) {
     return function (e) {
         if (!enabled) return;
         const key = e.key;
-        if (key === "a") rotateZ += -0.2;
-        if (key === "d") rotateZ += 0.2;
+        if (key === "a") rotate = -1;
+        if (key === "d") rotate = 1;
     };
 }
 
 function handleKeyUp(e) {
     const key = e.key;
-    if (key === "a" || key === "d") rotateZ = 0;
+    if (key === "a" || key === "d") {
+        rotate = 0;
+        rotateZ = 0;
+    }
 }
 
 function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
@@ -81,6 +85,7 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
         if (!velocity.x) return;
 
         // rotate ship based on velocity
+        if (Math.abs(rotate)) rotateZ += rotate * 0.04;
         newRotation.z += -velocity.x * maxRotation + rotateZ;
         targetQuaternion.setFromEuler(newRotation);
         currentRotation.slerp(targetQuaternion, 0.05);
