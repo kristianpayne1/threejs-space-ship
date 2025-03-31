@@ -2,8 +2,8 @@ import { Euler, Plane, Quaternion, Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 import { useSpring } from "@react-spring/three";
 import { useEffect } from "react";
-import { clamp } from "three/src/math/MathUtils.js";
 
+// const distance = new Vector3(0, 0, 0);
 const previousPosition = new Vector3(0, 0, 0);
 const currentPosition = new Vector3();
 
@@ -14,12 +14,11 @@ const currentRotation = new Quaternion();
 const targetQuaternion = new Quaternion();
 
 const plane = new Plane(new Vector3(0, 0, Math.PI / 2));
-plane.translate(new Vector3(0, 0, 400));
+plane.translate(new Vector3(0, 0, 200));
 const result = new Vector3(0, 0, 0);
 
 let isOver = false;
-let offsetY = 0,
-    offsetX = 0;
+let rotateZ = 0;
 function handleWindowPointerOver() {
     isOver = true;
 }
@@ -37,17 +36,14 @@ function handleKeyDown(enabled) {
     return function (e) {
         if (!enabled) return;
         const key = e.key;
-        if (key === "a") offsetX = 12;
-        if (key === "d") offsetX = -12;
-        if (key === "w") offsetY = 6;
-        if (key === "s") offsetY = -6;
+        if (key === "a") rotateZ += -0.2;
+        if (key === "d") rotateZ += 0.2;
     };
 }
 
 function handleKeyUp(e) {
     const key = e.key;
-    if (key === "a" || key === "d") offsetX = 0;
-    if (key === "w" || key === "s") offsetY = 0;
+    if (key === "a" || key === "d") rotateZ = 0;
 }
 
 function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
@@ -59,14 +55,19 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
     useFrame(({ raycaster }, deltaTime) => {
         if (isOver) raycaster.ray.intersectPlane(plane, result);
         else result.set(0, 0, 0);
+
+        // position ship
         currentPosition.set(...position);
-        currentPosition.x = offsetX;
-        currentPosition.y = offsetY;
+        currentPosition.lerp(
+            new Vector3(result.x, result.y, currentPosition.z),
+            0.1,
+        );
 
         api.start({
             position: currentPosition.toArray(),
         });
 
+        // point ship towards cursor
         previousRotation.copy(ref.current.quaternion);
         ref.current.lookAt(result);
         newRotation.copy(ref.current.rotation);
@@ -77,11 +78,11 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
         const distance = currentPosition.sub(previousPosition);
         const velocity = distance.divideScalar(deltaTime);
         previousPosition.copy(ref.current.position);
+        if (!velocity.x) return;
 
         // rotate ship based on velocity
         newRotation.z += -velocity.x * maxRotation;
         targetQuaternion.setFromEuler(newRotation);
-        console.log(targetQuaternion);
         currentRotation.slerp(targetQuaternion, 0.05);
         ref.current.quaternion.copy(currentRotation);
     });

@@ -5,9 +5,9 @@ function LaserGun(props) {
         <Line
             points={[
                 [0, 0, 2.5],
-                [0, 0, 400],
+                [0, 0, 200],
             ]}
-            lineWidth={2}
+            lineWidth={4}
             color={"red"}
             {...props}
         />
