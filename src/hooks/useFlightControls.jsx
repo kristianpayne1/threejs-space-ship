@@ -82,7 +82,7 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
         const distance = currentPosition.sub(previousPosition);
         const velocity = distance.divideScalar(deltaTime);
         previousPosition.copy(ref.current.position);
-        if (!velocity.x) return;
+        if (!velocity.x) velocity.x = 0;
 
         // rotate ship based on velocity
         if (Math.abs(rotate)) rotateZ += rotate * 0.04;
