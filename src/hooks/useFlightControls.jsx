@@ -85,7 +85,7 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
         if (!velocity.x) velocity.x = 0;
 
         // rotate ship based on velocity
-        if (Math.abs(rotate)) rotateZ += rotate * 0.04;
+        if (Math.abs(rotate)) rotateZ += rotate * 6 * deltaTime;
         newRotation.z += -velocity.x * maxRotation + rotateZ;
         targetQuaternion.setFromEuler(newRotation);
         currentRotation.slerp(targetQuaternion, 0.05);
