@@ -8,7 +8,10 @@ function LaserGun(props) {
                 [0, 0, 200],
             ]}
             lineWidth={4}
-            color={"red"}
+            color={"grey"}
+            dashed={true}
+            dashSize={4}
+            dashOffset={2}
             {...props}
         />
     );

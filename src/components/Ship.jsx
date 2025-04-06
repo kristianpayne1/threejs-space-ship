@@ -5,6 +5,7 @@ import useTextures from "../hooks/useTextures.jsx";
 import { SRGBColorSpace } from "three";
 import useFlightControls from "../hooks/useFlightControls.jsx";
 import LaserGun from "./LaserGun.jsx";
+import Thrusters from "./Thrusters.jsx";
 
 function Ship({ position, ...props }) {
     const ref = useRef(null);
@@ -42,6 +43,12 @@ function Ship({ position, ...props }) {
                 material={materials["Material.001"]}
                 rotation={[Math.PI / 2, 0, 0]}
                 scale={0.004}
+            />
+            <Thrusters
+                positions={[
+                    [-0.93, 0.4, -2],
+                    [0.93, 0.4, -2],
+                ]}
             />
             <LaserGun />
         </animated.group>
