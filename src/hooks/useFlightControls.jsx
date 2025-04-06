@@ -8,7 +8,7 @@ const previousPosition = new Vector3(0, 0, 0);
 const currentPosition = new Vector3();
 
 const previousRotation = new Quaternion();
-const maxRotation = Math.PI / 125;
+const maxRotation = Math.PI / 100;
 const newRotation = new Euler();
 const currentRotation = new Quaternion();
 const targetQuaternion = new Quaternion();
