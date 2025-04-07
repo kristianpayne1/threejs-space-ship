@@ -5,7 +5,6 @@ import { Environment, OrbitControls } from "@react-three/drei";
 function Game() {
     return (
         <TextureProvider>
-            <OrbitControls />
             <ambientLight />
             <directionalLight />
             <Ship position={[0, 0, -20]} />
