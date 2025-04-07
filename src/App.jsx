@@ -1,21 +1,15 @@
 import { Canvas } from "@react-three/fiber";
 import { AudioListenerProvider } from "./hooks/useAudioListener.jsx";
-import { Loader, Stars } from "@react-three/drei";
-import Ship from "./components/Ship.jsx";
-import { TextureProvider } from "./hooks/useTextures.jsx";
+import { Loader } from "@react-three/drei";
 import { Suspense } from "react";
+import Game from "./components/Game.jsx";
 
 function App() {
     return (
         <AudioListenerProvider>
             <Canvas camera={{ position: [0, 0, -40], fov: 40 }} shadows>
                 <Suspense fallback={null}>
-                    <TextureProvider>
-                        <ambientLight />
-                        <directionalLight />
-                        <Ship position={[0, 0, -20]} />
-                        <Stars radius={300} count={2000} saturation={0} />
-                    </TextureProvider>
+                    <Game />
                 </Suspense>
             </Canvas>
             <Loader />
