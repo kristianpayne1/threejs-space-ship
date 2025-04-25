@@ -28,8 +28,9 @@ function Thrusters({ positions = [[0, 0, 0]] }) {
 
     return (
         <>
-            {positions.map((position) => (
+            {positions.map((position, index) => (
                 <Cone
+                    key={index}
                     ref={ref}
                     position={position}
                     args={[0.11, 1, 8, 10, true]}

@@ -2,6 +2,8 @@ import { Euler, Plane, Quaternion, Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 import { useSpring } from "@react-spring/three";
 import { useEffect } from "react";
+import useIsOver from "./useIsOver.jsx";
+import usePointerPosition from "./usePointerPosition.jsx";
 
 // const distance = new Vector3(0, 0, 0);
 const previousPosition = new Vector3(0, 0, 0);
@@ -15,18 +17,12 @@ const targetQuaternion = new Quaternion();
 
 const plane = new Plane(new Vector3(0, 0, Math.PI / 2));
 plane.translate(new Vector3(0, 0, 200));
-const result = new Vector3(0, 0, 0);
 
-let isOver = false;
 let rotate = 0,
     rotateZ = 0;
-function handleWindowPointerOver() {
-    isOver = true;
-}
 
 function handleWindowPointerOut(api, position) {
     return function () {
-        isOver = false;
         api.start({
             position,
         });
@@ -51,15 +47,13 @@ function handleKeyUp(e) {
 }
 
 function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
+    const result = usePointerPosition();
     const [springs, api] = useSpring(() => ({
         position,
         config: { mass: 200, friction: 600, tension: 800 },
     }));
 
-    useFrame(({ raycaster }, deltaTime) => {
-        if (isOver) raycaster.ray.intersectPlane(plane, result);
-        else result.set(0, 0, 0);
-
+    useFrame((_, deltaTime) => {
         // position ship
         currentPosition.set(...position);
         currentPosition.lerp(
@@ -93,7 +87,6 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
     });
 
     useEffect(() => {
-        window.addEventListener("pointerover", handleWindowPointerOver);
         window.addEventListener(
             "pointerout",
             handleWindowPointerOut(api, position),
@@ -102,7 +95,6 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
         window.addEventListener("keyup", handleKeyUp);
 
         return () => {
-            window.removeEventListener("pointerover", handleWindowPointerOver);
             window.removeEventListener(
                 "pointerout",
                 handleWindowPointerOut(api, position),
