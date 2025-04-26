@@ -4,8 +4,11 @@ import { Plane, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import usePointerPosition from "../hooks/usePointerPosition.jsx";
+import { Color } from "three";
 
-function Crosshair() {
+const defaultColor = new Color("#00ff00");
+
+function Crosshair({ color = defaultColor } = {}) {
     const farRef = useRef(null);
     const nearRef = useRef(null);
 
@@ -34,7 +37,11 @@ function Crosshair() {
                 position={[0, 0, 100]}
                 rotation={[0, Math.PI, 0]}
             >
-                <meshBasicMaterial map={texture} transparent={true} />
+                <meshBasicMaterial
+                    map={texture}
+                    transparent={true}
+                    color={color}
+                />
             </Plane>
             <Plane
                 ref={farRef}
@@ -42,7 +49,11 @@ function Crosshair() {
                 position={[0, 0, 200]}
                 rotation={[0, Math.PI, 0]}
             >
-                <meshBasicMaterial map={texture} transparent={true} />
+                <meshBasicMaterial
+                    map={texture}
+                    transparent={true}
+                    color={color}
+                />
             </Plane>
         </group>
     );
