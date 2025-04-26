@@ -1,31 +1,21 @@
 import { useGLTF } from "@react-three/drei";
 import { animated } from "@react-spring/three";
-import { useEffect, useRef, useState } from "react";
-import useTextures from "../hooks/useTextures.jsx";
-import { SRGBColorSpace } from "three";
+import { useRef } from "react";
 import useFlightControls from "../hooks/useFlightControls.jsx";
 import LaserGun from "./LaserGun.jsx";
 import Thrusters from "./Thrusters.jsx";
+import Crosshair from "./Crosshair.jsx";
+import useCurrentTexture from "../hooks/useCurrentTexture.jsx";
 
 function Ship({ position, ...props }) {
     const ref = useRef(null);
     const shipRef = useRef(null);
-    const [textureIndex, setTextureIndex] = useState(1);
 
     const { nodes, materials } = useGLTF("./models/Space_Ship.glb");
-    const textures = useTextures();
+
+    const [, setTextureIndex] = useCurrentTexture(shipRef);
 
     const [springs] = useFlightControls(ref, { position });
-
-    // swap texture
-    useEffect(() => {
-        if (!textures.length || !shipRef.current) return;
-        const texture = textures[textureIndex % textures.length];
-        texture.colorSpace = SRGBColorSpace;
-        texture.flipY = false;
-        texture.needsUpdate = true;
-        shipRef.current.material.map = texture;
-    }, [textureIndex, shipRef, textures]);
 
     return (
         <animated.group
@@ -51,6 +41,7 @@ function Ship({ position, ...props }) {
                 ]}
             />
             <LaserGun />
+            <Crosshair />
         </animated.group>
     );
 }

@@ -1,11 +1,11 @@
-import Crosshair from "./Crosshair.jsx";
+import { useGLTF } from "@react-three/drei";
+import useTextures from "../hooks/useTextures.jsx";
 
 function LaserGun() {
-    return (
-        <group>
-            <Crosshair />
-        </group>
-    );
+    const { nodes, materials } = useGLTF("./models/Laser_Turret.glb");
+    const textures = useTextures();
+
+    return <group></group>;
 }
 
 export default LaserGun;
