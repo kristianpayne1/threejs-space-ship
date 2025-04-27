@@ -1,21 +1,31 @@
 import useTextures from "./useTextures.jsx";
-import { useEffect, useState } from "react";
 import { SRGBColorSpace } from "three";
+import { createContext, useContext, useEffect, useState } from "react";
+
+const CurrentTextureContext = createContext([0, () => {}]);
+
+export function CurrentTextureProvider({ children }) {
+    const [textureIndex, setTextureIndex] = useState(0);
+    return (
+        <CurrentTextureContext.Provider value={[textureIndex, setTextureIndex]}>
+            {children}
+        </CurrentTextureContext.Provider>
+    );
+}
 
 function useCurrentTexture(ref) {
-    const [textureIndex, setTextureIndex] = useState(1);
-
+    const [textureIndex, setTextureIndex] = useContext(CurrentTextureContext);
     const textures = useTextures();
 
-    // swap texture
     useEffect(() => {
         if (!textures.length || !ref.current) return;
+
         const texture = textures[textureIndex % textures.length];
         texture.colorSpace = SRGBColorSpace;
         texture.flipY = false;
         texture.needsUpdate = true;
         ref.current.material.map = texture;
-    }, [textureIndex, ref, textures]);
+    }, [ref, textureIndex, textures]);
 
     return [textureIndex, setTextureIndex];
 }

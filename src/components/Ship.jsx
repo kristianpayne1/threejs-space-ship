@@ -14,7 +14,6 @@ function Ship({ position, ...props }) {
     const { nodes, materials } = useGLTF("./models/Space_Ship.glb");
 
     const [, setTextureIndex] = useCurrentTexture(shipRef);
-
     const [springs] = useFlightControls(ref, { position });
 
     return (
@@ -22,7 +21,7 @@ function Ship({ position, ...props }) {
             ref={ref}
             position={springs.position}
             rotation={springs.rotation}
-            onClick={() => setTextureIndex((state) => state + 1)}
+            onClick={() => setTextureIndex((prevState) => prevState + 1)}
             {...props}
         >
             <mesh
@@ -40,7 +39,10 @@ function Ship({ position, ...props }) {
                     [0.93, 0.4, -2],
                 ]}
             />
-            <LaserGun />
+            <LaserGun
+                position={[-1.5, 0.6, 0]}
+                rotation={[0, 0, Math.PI * -0.1]}
+            />
             <Crosshair />
         </animated.group>
     );
