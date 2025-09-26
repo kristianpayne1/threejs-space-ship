@@ -2,12 +2,13 @@ import { Euler, Plane, Quaternion, Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 import { useSpring } from "@react-spring/three";
 import { useEffect } from "react";
-import useIsOver from "./useIsOver.jsx";
 import usePointerPosition from "./usePointerPosition.jsx";
 
 // const distance = new Vector3(0, 0, 0);
 const previousPosition = new Vector3(0, 0, 0);
 const currentPosition = new Vector3();
+const newShipPosition = new Vector3();
+const turbulencePosition = new Vector3();
 
 const previousRotation = new Quaternion();
 const maxRotation = Math.PI / 100;
@@ -46,7 +47,16 @@ function handleKeyUp(e) {
     }
 }
 
-function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
+function getRandomInt(min, max) {
+    const minCeiled = Math.ceil(min);
+    const maxFloored = Math.floor(max);
+    return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
+}
+
+function useFlightControls(
+    ref,
+    { position = [0, 0, 0], turbulence = 25, enabled = true },
+) {
     const result = usePointerPosition();
     const [springs, api] = useSpring(() => ({
         position,
@@ -54,10 +64,18 @@ function useFlightControls(ref, { position = [0, 0, 0], enabled = true }) {
     }));
 
     useFrame((_, deltaTime) => {
+        const getRandomTurbulence = () => getRandomInt(-turbulence, turbulence);
+        const turbulancePosition = turbulencePosition.set(
+            getRandomTurbulence(),
+            getRandomTurbulence(),
+            getRandomTurbulence(),
+        );
         // position ship
         currentPosition.set(...position);
         currentPosition.lerp(
-            new Vector3(result.x, result.y, currentPosition.z),
+            newShipPosition
+                .set(result.x, result.y, currentPosition.z)
+                .add(turbulancePosition),
             0.1,
         );
 
