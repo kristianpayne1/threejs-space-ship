@@ -5,6 +5,7 @@ import { useRef } from "react";
 import vertexShader from "../shaders/thrusters/vertex.glsl";
 import fragmentShader from "../shaders/thrusters/fragment.glsl";
 import { Color } from "three";
+import { getRandomInt } from "../utils.js";
 
 const ThrusterMaterial = shaderMaterial(
     {
@@ -17,8 +18,25 @@ const ThrusterMaterial = shaderMaterial(
 
 extend({ ThrusterMaterial });
 
+function Thruster({ position, frequency = 150 }) {
+    const matRef = useRef();
+    useFrame((_, deltaTime) => {
+        if (!matRef.current) return;
+        matRef.current.uniforms.uTime.value +=
+            getRandomInt(0, 1) + deltaTime * frequency;
+    });
+    return (
+        <Cone
+            position={position}
+            args={[0.11, 1, 8, 10, true]}
+            rotation={[-Math.PI / 2, Math.PI / 7, 0]}
+        >
+            <thrusterMaterial ref={matRef} transparent />
+        </Cone>
+    );
+}
+
 function Thrusters({ positions = [[0, 0, 0]] }) {
-    const ref = useRef(null);
     const materialRef = useRef(null);
 
     useFrame((_, deltaTime) => {
@@ -29,20 +47,7 @@ function Thrusters({ positions = [[0, 0, 0]] }) {
     return (
         <>
             {positions.map((position, index) => (
-                <Cone
-                    key={index}
-                    ref={ref}
-                    position={position}
-                    args={[0.11, 1, 8, 10, true]}
-                    rotation={[-Math.PI / 2, Math.PI / 7, 0]}
-                >
-                    <thrusterMaterial ref={materialRef} transparent={true} />
-                    {/*<meshBasicMaterial*/}
-                    {/*    transparent={true}*/}
-                    {/*    opacity={0.75}*/}
-                    {/*    color={"#20bdff"}*/}
-                    {/*/>*/}
-                </Cone>
+                <Thruster key={index} position={position} />
             ))}
         </>
     );

@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { useSpring } from "@react-spring/three";
 import { useEffect } from "react";
 import usePointerPosition from "./usePointerPosition.jsx";
+import { getRandomInt } from "../utils.js";
 
 // const distance = new Vector3(0, 0, 0);
 const previousPosition = new Vector3(0, 0, 0);
@@ -45,12 +46,6 @@ function handleKeyUp(e) {
         rotate = 0;
         rotateZ = 0;
     }
-}
-
-function getRandomInt(min, max) {
-    const minCeiled = Math.ceil(min);
-    const maxFloored = Math.floor(max);
-    return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
 }
 
 function useFlightControls(
