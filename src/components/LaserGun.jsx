@@ -1,5 +1,5 @@
-import { useGLTF } from "@react-three/drei";
 import { useRef } from "react";
+import { useGLTF } from "@react-three/drei";
 import useCurrentTexture from "../hooks/useCurrentTexture.jsx";
 
 function LaserGun(props) {
@@ -17,7 +17,7 @@ function LaserGun(props) {
                 geometry={nodes.SM_Veh_Part_Misc_06.geometry}
                 material={materials["Material.001"]}
                 rotation={[Math.PI / 2, 0, 0]}
-                scale={0.005}
+                scale={0.004}
             />
         </group>
     );

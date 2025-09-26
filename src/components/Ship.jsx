@@ -2,10 +2,10 @@ import { useGLTF } from "@react-three/drei";
 import { animated } from "@react-spring/three";
 import { useRef } from "react";
 import useFlightControls from "../hooks/useFlightControls.jsx";
-import LaserGun from "./LaserGun.jsx";
 import Thrusters from "./Thrusters.jsx";
 import Crosshair from "./Crosshair.jsx";
 import useCurrentTexture from "../hooks/useCurrentTexture.jsx";
+import Guns from "./Guns.jsx";
 
 function Ship({ position, ...props }) {
     const ref = useRef(null);
@@ -39,9 +39,19 @@ function Ship({ position, ...props }) {
                     [0.93, 0.4, -2],
                 ]}
             />
-            <LaserGun
-                position={[-1.5, 0.6, 0]}
-                rotation={[0, 0, Math.PI * -0.1]}
+            <Guns
+                guns={[
+                    {
+                        type: "laser_gun",
+                        position: [-1.5, 0.575, 0],
+                        rotation: [0, 0, Math.PI * -0.1],
+                    },
+                    {
+                        type: "laser_gun",
+                        position: [1.5, 0.575, 0],
+                        rotation: [0, 0, Math.PI * 0.1],
+                    },
+                ]}
             />
             <Crosshair />
         </animated.group>
