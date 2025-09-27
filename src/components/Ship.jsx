@@ -4,7 +4,6 @@ import { useRef } from "react";
 import useFlightControls from "../hooks/useFlightControls.jsx";
 import Thrusters from "./Thrusters.jsx";
 import Crosshair from "./Crosshair.jsx";
-import useCurrentTexture from "../hooks/useCurrentTexture.jsx";
 import Guns from "./Guns.jsx";
 
 function Ship({ position, ...props }) {
@@ -13,7 +12,6 @@ function Ship({ position, ...props }) {
 
     const { nodes, materials } = useGLTF("./models/Space_Ship.glb");
 
-    const [, setTextureIndex] = useCurrentTexture(shipRef);
     const [springs] = useFlightControls(ref, { position });
 
     return (
@@ -21,7 +19,6 @@ function Ship({ position, ...props }) {
             ref={ref}
             position={springs.position}
             rotation={springs.rotation}
-            onClick={() => setTextureIndex((prevState) => prevState + 1)}
             {...props}
         >
             <mesh
