@@ -31,13 +31,14 @@ function Laser({ position, target, range, onDone }) {
     );
 }
 
-function Lasers({ fire, range = 150, limit = 100, gunRef }) {
+function Lasers({ fire, fireRate = 0.2, range = 150, limit = 100, gunRef }) {
     const { scene } = useThree();
     const [shots, setShots] = useState([]);
+    const lastFired = useRef(0);
 
     const result = usePointerPosition();
 
-    useEffect(() => {
+    function addShot() {
         if (!fire || !gunRef.current) return;
         gunRef.current.getWorldPosition(worldPosition);
         const position = worldPosition.clone();
@@ -53,7 +54,16 @@ function Lasers({ fire, range = 150, limit = 100, gunRef }) {
                     setShots((prev) => prev.filter((shot) => shot.id !== id)),
             },
         ]);
-    }, [fire]);
+    }
+
+    useFrame((_, deltaTime) => {
+        if (!fire) return;
+        lastFired.current += deltaTime;
+        if (lastFired.current >= fireRate) {
+            addShot();
+            lastFired.current = 0;
+        }
+    });
 
     return createPortal(
         <Instances
