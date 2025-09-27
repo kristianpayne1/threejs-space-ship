@@ -1,18 +1,26 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Instance, Instances, useGLTF } from "@react-three/drei";
 import useCurrentTexture from "../hooks/useCurrentTexture.jsx";
 import { CapsuleGeometry, MeshStandardMaterial, Vector3 } from "three";
 import { createPortal, useFrame, useThree } from "@react-three/fiber";
+import usePointerPosition from "../hooks/usePointerPosition.jsx";
 
 const worldPosition = new Vector3();
-const worldRotation = new Vector3();
 
-function Laser({ position }) {
+function Laser({ position, target, range }) {
     const ref = useRef(null);
+
+    useEffect(() => {
+        ref.current.lookAt(target);
+        ref.current.rotateX(Math.PI / 2);
+    }, []);
 
     useFrame((_, deltaTime) => {
         if (!ref.current) return;
-        ref.current.position.z += deltaTime * 100;
+        ref.current.position.lerp(target, deltaTime);
+        if (ref.current.position.z >= range) {
+            console.log("remove laser");
+        }
     });
 
     return (
@@ -26,15 +34,19 @@ function Laser({ position }) {
 
 function Lasers({ fire, range = 100, limit = 100, gunRef }) {
     const { scene } = useThree();
-    const [lasers, setLasers] = useState([]);
+    const lasers = useRef([]);
+
+    const result = usePointerPosition();
 
     useEffect(() => {
         if (!fire || !gunRef.current) return;
         gunRef.current.getWorldPosition(worldPosition);
-        gunRef.current.getWorldDirection(worldRotation);
         const position = worldPosition.clone();
-        const direction = worldRotation.clone();
-        setLasers((prev) => [...prev, { position, direction }]);
+        lasers.current.push({
+            position,
+            target: result.clone(),
+            range,
+        });
     }, [fire]);
 
     return createPortal(
@@ -44,7 +56,7 @@ function Lasers({ fire, range = 100, limit = 100, gunRef }) {
             material={new MeshStandardMaterial({ color: "red" })}
             geometry={new CapsuleGeometry(0.05, 3, 1, 7, 1)}
         >
-            {lasers.map((laserProps, index) => (
+            {lasers.current.map((laserProps, index) => (
                 <Laser key={index} {...laserProps} />
             ))}
         </Instances>,
