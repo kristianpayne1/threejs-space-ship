@@ -40,6 +40,7 @@ function Lasers({ fire, fireRate = 0.2, range = 150, limit = 100, gunRef }) {
 
     function addShot() {
         if (!fire || !gunRef.current) return;
+        lastFired.current = 0;
         gunRef.current.getWorldPosition(worldPosition);
         const position = worldPosition.clone();
         const id = shotId++;
@@ -56,13 +57,13 @@ function Lasers({ fire, fireRate = 0.2, range = 150, limit = 100, gunRef }) {
         ]);
     }
 
+    useEffect(() => {
+        if (fire && lastFired >= fireRate) addShot();
+    }, [fire]);
+
     useFrame((_, deltaTime) => {
-        if (!fire) return;
         lastFired.current += deltaTime;
-        if (lastFired.current >= fireRate) {
-            addShot();
-            lastFired.current = 0;
-        }
+        if (lastFired.current >= fireRate) addShot();
     });
 
     return createPortal(
