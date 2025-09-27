@@ -19,7 +19,7 @@ function Laser({ position, target, range, onDone }) {
     useFrame((_, deltaTime) => {
         if (!ref.current) return;
         ref.current.position.lerp(target, deltaTime);
-        if (ref.current.position.z >= range) onDone();
+        if (ref.current.position.distanceTo(position) >= range) onDone();
     });
 
     return (
