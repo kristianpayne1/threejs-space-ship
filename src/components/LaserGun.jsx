@@ -6,6 +6,7 @@ import { createPortal, useFrame, useThree } from "@react-three/fiber";
 import usePointerPosition from "../hooks/usePointerPosition.jsx";
 
 const worldPosition = new Vector3();
+const laserPositionOffset = new Vector3(0, 0, 3);
 let shotId = 0;
 
 function Laser({ position, target, range, onDone }) {
@@ -42,7 +43,7 @@ function Lasers({ fire, fireRate = 0.2, range = 150, limit = 100, gunRef }) {
         if (!fire || !gunRef.current) return;
         lastFired.current = 0;
         gunRef.current.getWorldPosition(worldPosition);
-        const position = worldPosition.clone();
+        const position = worldPosition.clone().add(laserPositionOffset);
         const id = shotId++;
         setShots((prev) => [
             ...prev,
