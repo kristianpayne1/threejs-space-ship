@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Instance, Instances, useGLTF } from "@react-three/drei";
 import useCurrentTexture from "../hooks/useCurrentTexture.jsx";
 import { CapsuleGeometry, MeshStandardMaterial, Vector3 } from "three";
@@ -6,8 +6,9 @@ import { createPortal, useFrame, useThree } from "@react-three/fiber";
 import usePointerPosition from "../hooks/usePointerPosition.jsx";
 
 const worldPosition = new Vector3();
+let shotId = 0;
 
-function Laser({ position, target, range }) {
+function Laser({ position, target, range, onDone }) {
     const ref = useRef(null);
 
     useEffect(() => {
@@ -18,9 +19,7 @@ function Laser({ position, target, range }) {
     useFrame((_, deltaTime) => {
         if (!ref.current) return;
         ref.current.position.lerp(target, deltaTime);
-        if (ref.current.position.z >= range) {
-            console.log("remove laser");
-        }
+        if (ref.current.position.z >= range) onDone();
     });
 
     return (
@@ -32,9 +31,9 @@ function Laser({ position, target, range }) {
     );
 }
 
-function Lasers({ fire, range = 100, limit = 100, gunRef }) {
+function Lasers({ fire, range = 150, limit = 100, gunRef }) {
     const { scene } = useThree();
-    const lasers = useRef([]);
+    const [shots, setShots] = useState([]);
 
     const result = usePointerPosition();
 
@@ -42,22 +41,35 @@ function Lasers({ fire, range = 100, limit = 100, gunRef }) {
         if (!fire || !gunRef.current) return;
         gunRef.current.getWorldPosition(worldPosition);
         const position = worldPosition.clone();
-        lasers.current.push({
-            position,
-            target: result.clone(),
-            range,
-        });
+        const id = shotId++;
+        setShots((prev) => [
+            ...prev,
+            {
+                id,
+                position,
+                target: result.clone(),
+                range,
+                onDone: () =>
+                    setShots((prev) => prev.filter((shot) => shot.id !== id)),
+            },
+        ]);
     }, [fire]);
 
     return createPortal(
         <Instances
             range={range}
             limit={limit}
-            material={new MeshStandardMaterial({ color: "red" })}
+            material={
+                new MeshStandardMaterial({
+                    color: "red",
+                    emissive: "red",
+                    emissiveIntensity: 1.5,
+                })
+            }
             geometry={new CapsuleGeometry(0.05, 3, 1, 7, 1)}
         >
-            {lasers.current.map((laserProps, index) => (
-                <Laser key={index} {...laserProps} />
+            {shots.map(({ id, ...laserProps }) => (
+                <Laser key={id} {...laserProps} />
             ))}
         </Instances>,
         scene,
