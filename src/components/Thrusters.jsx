@@ -1,11 +1,12 @@
 import { Cone, shaderMaterial } from "@react-three/drei";
 import { extend, useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import vertexShader from "../shaders/thrusters/vertex.glsl";
 import fragmentShader from "../shaders/thrusters/fragment.glsl";
 import { Color } from "three";
-import { getRandomInt } from "../utils.js";
+import { getRandomInt, normalise } from "../utils.js";
+import { useFlightControlsContext } from "../hooks/useFlightControls.jsx";
 
 const ThrusterMaterial = shaderMaterial(
     {
@@ -18,17 +19,30 @@ const ThrusterMaterial = shaderMaterial(
 
 extend({ ThrusterMaterial });
 
-function Thruster({ position, frequency = 150 }) {
+function Thruster({ position, frequency = 200 }) {
+    const ref = useRef();
     const matRef = useRef();
+    const { getSpeed, initialSpeed } = useFlightControlsContext();
+
+    useEffect(() => {
+        if (!ref.current) return;
+        ref.current.geometry.translate(0, 2, 0);
+    }, []);
+
     useFrame((_, deltaTime) => {
-        if (!matRef.current) return;
+        const speed = getSpeed();
+        if (!matRef.current || !ref.current) return;
+        const scaleY = normalise(speed, 0, initialSpeed);
+        ref.current.scale.set(1, scaleY, 1);
         matRef.current.uniforms.uTime.value +=
             getRandomInt(0, 1) + deltaTime * frequency;
     });
+
     return (
         <Cone
+            ref={ref}
             position={position}
-            args={[0.11, 1, 8, 10, true]}
+            args={[0.11, 5, 8, 20, true]}
             rotation={[-Math.PI / 2, Math.PI / 7, 0]}
         >
             <thrusterMaterial ref={matRef} transparent />

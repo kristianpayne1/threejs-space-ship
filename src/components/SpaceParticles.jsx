@@ -1,8 +1,10 @@
 import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useFlightControlsContext } from "../hooks/useFlightControls.jsx";
 
-function SpaceParticles({ count = 500, speed = 20, ...props }) {
+function SpaceParticles({ count = 500, ...props }) {
     const points = useRef();
+    const { getSpeed } = useFlightControlsContext();
 
     const positions = useMemo(() => {
         const arr = new Float32Array(count * 3);
@@ -15,6 +17,7 @@ function SpaceParticles({ count = 500, speed = 20, ...props }) {
     }, [count]);
 
     useFrame((state, delta) => {
+        const speed = getSpeed();
         const pos = points.current.geometry.attributes.position.array;
         for (let i = 0; i < count; i++) {
             pos[i * 3 + 2] -= speed * delta;
@@ -33,7 +36,7 @@ function SpaceParticles({ count = 500, speed = 20, ...props }) {
                     itemSize={3}
                 />
             </bufferGeometry>
-            <pointsMaterial color="white" size={0.1} sizeAttenuation />
+            <pointsMaterial color="white" size={0.2} sizeAttenuation />
         </points>
     );
 }

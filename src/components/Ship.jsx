@@ -32,8 +32,8 @@ function Ship({ position, ...props }) {
             />
             <Thrusters
                 positions={[
-                    [-0.93, 0.4, -2],
-                    [0.93, 0.4, -2],
+                    [-0.93, 0.4, -1.15],
+                    [0.93, 0.4, -1.15],
                 ]}
             />
             <Guns

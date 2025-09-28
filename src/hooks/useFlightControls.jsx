@@ -1,9 +1,10 @@
 import { Euler, Plane, Quaternion, Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 import { useSpring } from "@react-spring/three";
-import { useEffect } from "react";
+import { useEffect, createContext, useContext, useState, useRef } from "react";
 import usePointerPosition from "./usePointerPosition.jsx";
 import { getRandomInt } from "../utils.js";
+import { lerp } from "three/src/math/MathUtils.js";
 
 // const distance = new Vector3(0, 0, 0);
 const previousPosition = new Vector3(0, 0, 0);
@@ -21,7 +22,61 @@ const plane = new Plane(new Vector3(0, 0, Math.PI / 2));
 plane.translate(new Vector3(0, 0, 200));
 
 let rotate = 0,
-    rotateZ = 0;
+    rotateZ = 0,
+    throttle = 0;
+
+const flightControlsContext = createContext({
+    enabled: true,
+    speedStep: 20,
+    minSpeed: 10,
+    maxSpeed: 100,
+    turbulenceFactor: 0.75,
+    getSpeed: () => {},
+    setSpeed: () => {},
+});
+
+export function FlightControlsProvider({
+    enabled = true,
+    initialSpeed = 40,
+    maxSpeed = 80,
+    minSpeed = 10,
+    speedFactor = 20,
+    turbulenceFactor = 0.5,
+    children,
+}) {
+    let speedRef = useRef(initialSpeed);
+
+    function setSpeed(newSpeed) {
+        speedRef.current = newSpeed;
+    }
+
+    function getSpeed() {
+        return speedRef.current;
+    }
+
+    return (
+        <flightControlsContext.Provider
+            value={{
+                enabled,
+                getSpeed,
+                setSpeed,
+                speedFactor,
+                minSpeed,
+                maxSpeed,
+                initialSpeed,
+                turbulenceFactor,
+            }}
+        >
+            {children}
+        </flightControlsContext.Provider>
+    );
+}
+
+export function useFlightControlsContext() {
+    if (!flightControlsContext)
+        throw new Error("Must be used within FlightControlsProvider");
+    return useContext(flightControlsContext);
+}
 
 function handleWindowPointerOut(api, position) {
     return function () {
@@ -37,6 +92,8 @@ function handleKeyDown(enabled) {
         const key = e.key;
         if (key === "a") rotate = -1;
         if (key === "d") rotate = 1;
+        if (key === "w") throttle = 1;
+        if (key === "s") throttle = -1;
     };
 }
 
@@ -45,20 +102,31 @@ function handleKeyUp(e) {
     if (key === "a" || key === "d") {
         rotate = 0;
         rotateZ = 0;
+    } else if (key === "s" || key === "w") {
+        throttle = 0;
     }
 }
 
-function useFlightControls(
-    ref,
-    { position = [0, 0, 0], turbulence = 25, enabled = true },
-) {
+function useFlightControls(ref, { position = [0, 0, 0] }) {
     const result = usePointerPosition();
+    const {
+        getSpeed,
+        setSpeed,
+        initialSpeed,
+        speedFactor,
+        minSpeed,
+        maxSpeed,
+        turbulenceFactor,
+        enabled,
+    } = useFlightControlsContext();
     const [springs, api] = useSpring(() => ({
         position,
         config: { mass: 200, friction: 600, tension: 800 },
     }));
 
     useFrame((_, deltaTime) => {
+        const speed = getSpeed();
+        const turbulence = speed * turbulenceFactor;
         const getRandomTurbulence = () => getRandomInt(-turbulence, turbulence);
         const turbulancePosition = turbulencePosition.set(
             getRandomTurbulence(),
@@ -97,6 +165,20 @@ function useFlightControls(
         targetQuaternion.setFromEuler(newRotation);
         currentRotation.slerp(targetQuaternion, 0.05);
         ref.current.quaternion.copy(currentRotation);
+
+        if (throttle)
+            setSpeed(
+                Math.max(
+                    Math.min(
+                        speed + throttle * deltaTime * speedFactor,
+                        maxSpeed,
+                    ),
+                    minSpeed,
+                ),
+            );
+        else {
+            setSpeed(lerp(speed, initialSpeed, deltaTime));
+        }
     });
 
     useEffect(() => {
