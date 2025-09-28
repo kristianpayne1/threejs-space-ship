@@ -2,6 +2,7 @@ import { TextureProvider } from "../hooks/useTextures.jsx";
 import Ship from "./Ship.jsx";
 import { Environment } from "@react-three/drei";
 import { CurrentTextureProvider } from "../hooks/useCurrentTexture.jsx";
+import SpaceParticles from "./SpaceParticles.jsx";
 
 function Game() {
     return (
@@ -11,6 +12,7 @@ function Game() {
             <CurrentTextureProvider>
                 <Ship position={[0, 0, -20]} />
             </CurrentTextureProvider>
+            <SpaceParticles />
             <Environment
                 background={true}
                 path={"./textures/environment/"}
