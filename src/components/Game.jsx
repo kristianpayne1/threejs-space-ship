@@ -17,7 +17,7 @@ function Game() {
                 <Asteroids />
             </FlightControlsProvider>
             <ambientLight />
-            <directionalLight />
+            <directionalLight intensity={3} position={[-10, 10, -10]} />
             <Environment
                 background={true}
                 path={"./textures/environment/"}
