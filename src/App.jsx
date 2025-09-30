@@ -7,7 +7,7 @@ import Game from "./components/Game.jsx";
 function App() {
     return (
         <AudioListenerProvider>
-            <Canvas camera={{ position: [0, 0, -40], fov: 40 }} shadows>
+            <Canvas camera={{ position: [0, 2, -40], fov: 40 }} shadows>
                 <Suspense fallback={null}>
                     <Game />
                 </Suspense>

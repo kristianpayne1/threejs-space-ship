@@ -34,7 +34,7 @@ function Crosshair({ color = defaultColor } = {}) {
             <Plane
                 ref={nearRef}
                 args={[5, 5]}
-                position={[0, 0, 100]}
+                position={[0, 1, 100]}
                 rotation={[0, Math.PI, 0]}
             >
                 <meshBasicMaterial
