@@ -2,8 +2,8 @@ import { Cone, shaderMaterial } from "@react-three/drei";
 import { extend, useFrame } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 
-import vertexShader from "../shaders/thrusters/vertex.glsl";
-import fragmentShader from "../shaders/thrusters/fragment.glsl";
+import vertexShader from "../shaders/thrusters/vertex.glsl?raw";
+import fragmentShader from "../shaders/thrusters/fragment.glsl?raw";
 import { Color } from "three";
 import { getRandomInt, normalise } from "../utils.js";
 import { useFlightControlsContext } from "../hooks/useFlightControls.jsx";
@@ -26,7 +26,7 @@ function Thruster({ position, frequency = 200 }) {
 
     useEffect(() => {
         if (!ref.current) return;
-        ref.current.geometry.translate(0, 2, 0);
+        ref.current.geometry.translate(0, 1, 0);
     }, []);
 
     useFrame((_, deltaTime) => {
