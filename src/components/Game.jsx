@@ -4,6 +4,7 @@ import { Environment } from "@react-three/drei";
 import { CurrentTextureProvider } from "../hooks/useCurrentTexture.jsx";
 import SpaceParticles from "./SpaceParticles.jsx";
 import { FlightControlsProvider } from "../hooks/useFlightControls.jsx";
+import Asteroids from "./Asteroids.jsx";
 
 function Game() {
     return (
@@ -13,6 +14,7 @@ function Game() {
                     <Ship position={[0, 0, -20]} />
                 </CurrentTextureProvider>
                 <SpaceParticles />
+                <Asteroids />
             </FlightControlsProvider>
             <ambientLight />
             <directionalLight />

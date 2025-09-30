@@ -37,11 +37,11 @@ const flightControlsContext = createContext({
 
 export function FlightControlsProvider({
     enabled = true,
-    initialSpeed = 40,
-    maxSpeed = 80,
-    minSpeed = 10,
+    initialSpeed = 150,
+    maxSpeed = 300,
+    minSpeed = 50,
     speedFactor = 20,
-    turbulenceFactor = 0.5,
+    turbulenceFactor = 0.3,
     children,
 }) {
     let speedRef = useRef(initialSpeed);
