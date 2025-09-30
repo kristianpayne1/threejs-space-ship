@@ -40,7 +40,7 @@ export function FlightControlsProvider({
     initialSpeed = 150,
     maxSpeed = 300,
     minSpeed = 50,
-    speedFactor = 20,
+    speedFactor = 50,
     turbulenceFactor = 0.3,
     children,
 }) {
