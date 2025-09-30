@@ -1,25 +1,7 @@
 import LaserGun from "./LaserGun.jsx";
-import { useLayoutEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
-function Gun({ type, ...props }) {
-    const [fire, setFire] = useState(false);
-
-    useLayoutEffect(() => {
-        function onMouseDown() {
-            setFire(true);
-        }
-        function onMouseUp() {
-            setFire(false);
-        }
-
-        window.addEventListener("mousedown", onMouseDown);
-        window.addEventListener("mouseup", onMouseUp);
-        return () => {
-            window.removeEventListener("mousedown", onMouseDown);
-            window.removeEventListener("mouseup", onMouseUp);
-        };
-    }, []);
-
+function Gun({ type, fire, ...props }) {
     const GunType = useMemo(() => {
         return (gunProps) => {
             switch (type) {
