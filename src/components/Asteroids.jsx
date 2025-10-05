@@ -36,10 +36,7 @@ function getRandomScale(min, max) {
     return new Vector3(s, s, s);
 }
 
-function Asteroid({
-    position,
-    scaleConstraints: { minScale = 0.0075, maxScale = 0.06 } = {},
-}) {
+function Asteroid({ position, minScale, maxScale }) {
     const ref = useRef(null);
     const rotationRef = useRef(getRandomRotation());
     const scaleRef = useRef(getRandomScale(minScale, maxScale));
@@ -75,9 +72,16 @@ function Asteroid({
     );
 }
 
-function Asteroids({ range = 150, limit = 100 }) {
+function Asteroids({
+    range = 150,
+    limit = 24,
+    variant = 1,
+    minScale = 0.0075,
+    maxScale = 0.06,
+}) {
     const ref = useRef();
-    const { nodes } = useGLTF("./models/Astroid_01.glb");
+    const { nodes } = useGLTF(`./models/Astroid_0${variant}.glb`);
+    const geometry = nodes[`SM_Env_Astroid_0${variant}`].geometry;
 
     useCurrentTexture(ref);
 
@@ -92,10 +96,15 @@ function Asteroids({ range = 150, limit = 100 }) {
             range={range}
             limit={limit}
             material={new MeshStandardMaterial({ color: "gray" })}
-            geometry={nodes.SM_Env_Astroid_01.geometry}
+            geometry={geometry}
         >
             {positions.map((position, i) => (
-                <Asteroid key={i} position={position} />
+                <Asteroid
+                    key={i}
+                    position={position}
+                    maxScale={maxScale}
+                    minScale={minScale}
+                />
             ))}
         </Instances>
     );

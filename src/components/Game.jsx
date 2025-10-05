@@ -15,6 +15,8 @@ function Game() {
                 </CurrentTextureProvider>
                 <SpaceParticles />
                 <Asteroids />
+                <Asteroids variant={2} minScale={0.005} maxScale={0.025} />
+                <Asteroids variant={3} minScale={0.005} maxScale={0.025} />
             </FlightControlsProvider>
             <ambientLight />
             <directionalLight intensity={3} position={[-10, 10, -10]} />
