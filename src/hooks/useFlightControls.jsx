@@ -1,7 +1,7 @@
 import { Euler, Plane, Quaternion, Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 import { useSpring } from "@react-spring/three";
-import { useEffect, createContext, useContext, useState, useRef } from "react";
+import { useEffect, createContext, useContext, useRef } from "react";
 import usePointerPosition from "./usePointerPosition.jsx";
 import { getRandomInt } from "../utils.js";
 import { lerp } from "three/src/math/MathUtils.js";
