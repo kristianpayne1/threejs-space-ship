@@ -33,25 +33,36 @@ function getRandomRotation() {
     };
 }
 
-function Asteroid({ position }) {
+function getRandomScale(min, max) {
+    const s = MathUtils.randFloat(min, max);
+    return new Vector3(s, s, s);
+}
+
+function Asteroid({
+    position,
+    scaleConstraints: { minScale = 0.01, maxScale = 0.05 } = {},
+}) {
     const ref = useRef(null);
     const rotationRef = useRef(getRandomRotation());
+    const scaleRef = useRef(getRandomScale(minScale, maxScale));
 
     const { getSpeed } = useFlightControlsContext();
 
     const { axis, spinSpeed, initialRotation } = rotationRef.current;
+    const scale = scaleRef.current;
 
     useFrame((_, deltaTime) => {
         const speed = getSpeed();
         if (!ref.current) return;
 
-        ref.current.scale.lerp(fullScale, deltaTime * 2);
+        ref.current.scale.lerp(scale, deltaTime * 2);
         ref.current.position.z -= deltaTime * speed;
         ref.current.rotateOnAxis(axis, spinSpeed * deltaTime);
         if (ref.current.position.z < -50) {
             ref.current.scale.set(0, 0, 0);
             const newPosition = getRandomPosition();
             rotationRef.current = getRandomRotation();
+            scaleRef.current = getRandomScale(minScale, maxScale);
             ref.current.position.set(newPosition[0], newPosition[1], 600);
         }
     });
@@ -61,7 +72,7 @@ function Asteroid({ position }) {
             ref={ref}
             position={position}
             rotation={initialRotation}
-            scale={fullScale}
+            scale={scale}
         />
     );
 }
