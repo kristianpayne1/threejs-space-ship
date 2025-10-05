@@ -5,12 +5,10 @@ import { MeshStandardMaterial, Vector3, MathUtils } from "three";
 import { useFrame } from "@react-three/fiber";
 import useCurrentTexture from "../hooks/useCurrentTexture.jsx";
 
-const fullScale = new Vector3(0.02, 0.02, 0.02);
-
 function getRandomPosition() {
     return [
+        (Math.random() - 0.5) * 400,
         (Math.random() - 0.5) * 300,
-        (Math.random() - 0.5) * 200,
         Math.random() * 600,
     ];
 }
@@ -40,7 +38,7 @@ function getRandomScale(min, max) {
 
 function Asteroid({
     position,
-    scaleConstraints: { minScale = 0.01, maxScale = 0.05 } = {},
+    scaleConstraints: { minScale = 0.0075, maxScale = 0.06 } = {},
 }) {
     const ref = useRef(null);
     const rotationRef = useRef(getRandomRotation());
