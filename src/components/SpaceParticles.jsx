@@ -1,9 +1,27 @@
-import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useMemo, useRef } from "react";
+import { useFrame, extend } from "@react-three/fiber";
+import { shaderMaterial } from "@react-three/drei";
 import { useFlightControlsContext } from "../hooks/useFlightControls.jsx";
+import { AdditiveBlending } from "three";
 
-function SpaceParticles({ count = 500, ...props }) {
+import vertexShader from "../shaders/space_particles/vertex.glsl?raw";
+import fragmentShader from "../shaders/space_particles/fragment.glsl?raw";
+
+const SpaceParticlesMaterial = shaderMaterial(
+    {
+        uTime: 0,
+        uLifetime: 5.0,
+        uFade: 1.0,
+    },
+    vertexShader,
+    fragmentShader,
+);
+
+extend({ SpaceParticlesMaterial });
+
+export default function SpaceParticles({ count = 500 }) {
     const points = useRef();
+    const materialRef = useRef();
     const { getSpeed } = useFlightControlsContext();
 
     const positions = useMemo(() => {
@@ -16,18 +34,34 @@ function SpaceParticles({ count = 500, ...props }) {
         return arr;
     }, [count]);
 
+    const birthTimes = useMemo(() => {
+        const arr = new Float32Array(count);
+        for (let i = 0; i < count; i++) arr[i] = Math.random() * 5.0;
+        return arr;
+    }, [count]);
+
     useFrame((state, delta) => {
         const speed = getSpeed();
-        const pos = points.current.geometry.attributes.position.array;
+        const geom = points.current.geometry;
+        const pos = geom.attributes.position.array;
+        const births = geom.attributes.aBirth.array;
+
+        const time = (materialRef.current.uTime = state.clock.elapsedTime);
+
         for (let i = 0; i < count; i++) {
             pos[i * 3 + 2] -= speed * delta;
-            if (pos[i * 3 + 2] < -50) pos[i * 3 + 2] = 300;
+            if (pos[i * 3 + 2] < -50) {
+                pos[i * 3 + 2] = 300;
+                births[i] = time;
+            }
         }
-        points.current.geometry.attributes.position.needsUpdate = true;
+
+        geom.attributes.position.needsUpdate = true;
+        geom.attributes.aBirth.needsUpdate = true;
     });
 
     return (
-        <points ref={points} {...props}>
+        <points ref={points}>
             <bufferGeometry>
                 <bufferAttribute
                     attach="attributes-position"
@@ -35,10 +69,19 @@ function SpaceParticles({ count = 500, ...props }) {
                     array={positions}
                     itemSize={3}
                 />
+                <bufferAttribute
+                    attach="attributes-aBirth"
+                    count={birthTimes.length}
+                    array={birthTimes}
+                    itemSize={1}
+                />
             </bufferGeometry>
-            <pointsMaterial color="white" size={0.2} sizeAttenuation />
+            <spaceParticlesMaterial
+                ref={materialRef}
+                transparent
+                depthWrite={false}
+                blending={AdditiveBlending}
+            />
         </points>
     );
 }
-
-export default SpaceParticles;

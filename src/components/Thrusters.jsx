@@ -58,13 +58,6 @@ function Thruster({ position, frequency = 200 }) {
 }
 
 function Thrusters({ positions = [[0, 0, 0]] }) {
-    const materialRef = useRef(null);
-
-    useFrame((_, deltaTime) => {
-        if (!materialRef.current) return;
-        materialRef.current.uniforms.uTime += deltaTime;
-    });
-
     return (
         <>
             {positions.map((position, index) => (
