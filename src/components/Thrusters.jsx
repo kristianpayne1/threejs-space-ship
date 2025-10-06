@@ -39,14 +39,21 @@ function Thruster({ position, frequency = 200 }) {
     });
 
     return (
-        <Cone
-            ref={ref}
-            position={position}
-            args={[0.11, 5, 8, 20, true]}
-            rotation={[-Math.PI / 2, Math.PI / 7, 0]}
-        >
-            <thrusterMaterial ref={matRef} transparent />
-        </Cone>
+        <group position={position}>
+            <pointLight
+                color={"#30b9ff"}
+                position={[0, 0, -0.5]}
+                intensity={3}
+                castShadow={true}
+            />
+            <Cone
+                ref={ref}
+                args={[0.11, 5, 8, 20, true]}
+                rotation={[-Math.PI / 2, Math.PI / 7, 0]}
+            >
+                <thrusterMaterial ref={matRef} transparent />
+            </Cone>
+        </group>
     );
 }
 
