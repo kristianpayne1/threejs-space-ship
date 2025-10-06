@@ -50,7 +50,7 @@ function Asteroid({ position, minScale, maxScale }) {
         const speed = getSpeed();
         if (!ref.current) return;
 
-        ref.current.scale.lerp(scale, deltaTime * 2);
+        ref.current.scale.lerp(scale, deltaTime);
         ref.current.position.z -= deltaTime * speed;
         ref.current.rotateOnAxis(axis, spinSpeed * deltaTime);
         if (ref.current.position.z < -50) {
